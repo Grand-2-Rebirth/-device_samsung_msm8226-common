@@ -1,0 +1,10 @@
+allow vold efs_file:dir rw_dir_perms;
+allow vold efs_file:file create;
+allow vold media_data_file:dir { getattr search setattr };
+
+allow vold {
+    block_device
+    cache_block_device
+    efs_block_device
+    system_block_device
+}:blk_file getattr;
