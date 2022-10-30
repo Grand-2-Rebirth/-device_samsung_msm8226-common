@@ -1,5 +1,5 @@
-# Copyright (C) 2012 The CyanogenMod Project
-# Copyright (C) 2017-2019 The LineageOS Project
+#
+# Copyright (C) 2022 ArrowOS
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
 # Always preopt extracted APKs to prevent extracting out of the APK
 # for gms modules.
@@ -22,8 +23,7 @@ PRODUCT_SYSTEM_SERVER_COMPILER_FILTER := speed-profile
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
-    device/samsung/msm8226-common/overlay \
-    device/samsung/msm8226-common/overlay-lineage
+    device/samsung/msm8226-common/overlay
 
 # Permissions
 PRODUCT_COPY_FILES += \
@@ -135,10 +135,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.keymaster@3.0-impl
 
-# LiveDisplay
-PRODUCT_PACKAGES += \
-    vendor.lineage.livedisplay@2.0-service.samsung-qcom
-
 # Media
 PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_audio.xml \
@@ -200,10 +196,6 @@ PRODUCT_COPY_FILES += \
 # Sensors
 PRODUCT_PACKAGES += \
     android.hardware.sensors@1.0-impl.samsung8226
-
-# Touch features
-PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.samsung
 
 # USB
 PRODUCT_PACKAGES += \
