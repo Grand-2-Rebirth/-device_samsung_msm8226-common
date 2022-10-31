@@ -37,8 +37,11 @@ void cdma_properties(char const operator_alpha[],
         char const default_network[]);
 void gsm_properties(char const default_network[],
         char const lteOnGsmDevice[]);
+void wifi_properties(char const carrier[],
+        char const noril[]);
 void init_target_properties();
-void property_override(char const prop[], char const value[], bool add=false);
+void property_override(char const prop[], char const value[], bool add=true);
 void set_ro_product_prop(char const prop[], char const value[]);
+void set_ro_build_prop(char const prop[], char const value[]);
 
 #endif /* __INIT_MSM8226__H__ */

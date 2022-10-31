@@ -59,7 +59,6 @@ void loc_eng_nmea_send(char *pNmea, int length, loc_eng_data_s_type *loc_eng_dat
     struct timeval tv;
     gettimeofday(&tv, (struct timezone *) NULL);
     int64_t now = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
-    CALLBACK_LOG_CALLFLOW("nmea_cb", %p, pNmea);
     if (loc_eng_data_p->nmea_cb != NULL)
         loc_eng_data_p->nmea_cb(now, pNmea, length);
 
@@ -96,8 +95,12 @@ int loc_eng_nmea_put_checksum(char *pNmea, int maxSize)
         length++;
     }
 
+    // length now contains nmea sentence string length not including $ sign.
     int checksumLength = snprintf(pNmea,(maxSize-length-1),"*%02X\r\n", checksum);
-    return (length + checksumLength);
+
+    // total length of nmea sentence is length of nmea sentence inc $ sign plus
+    // length of checksum (+1 is to cover the $ character in the length).
+    return (length + checksumLength + 1);
 }
 
 /*===========================================================================
@@ -135,7 +138,7 @@ void loc_eng_nmea_generate_pos(loc_eng_data_s_type *loc_eng_data_p,
         return;
     }
 
-    char sentence[NMEA_SENTENCE_MAX_LENGTH] = {0};
+    char sentence[NMEA_SENTENCE_MAX_LENGTH] = {};
     char* pMarker = sentence;
     int lengthRemaining = sizeof(sentence);
     int length = 0;
@@ -152,7 +155,7 @@ void loc_eng_nmea_generate_pos(loc_eng_data_s_type *loc_eng_data_p,
         // ------------------
 
         uint32_t svUsedCount = 0;
-        uint32_t svUsedList[32] = {0};
+        uint32_t svUsedList[32] = {};
         uint32_t mask = loc_eng_data_p->gps_used_mask;
         for (uint8_t i = 1; mask > 0 && svUsedCount < 32; i++)
         {
@@ -223,7 +226,7 @@ void loc_eng_nmea_generate_pos(loc_eng_data_s_type *loc_eng_data_p,
         // ------$GNGSA------
         // ------------------
         uint32_t gloUsedCount = 0;
-        uint32_t gloUsedList[32] = {0};
+        uint32_t gloUsedList[32] = {};
 
         // Reset locals for GNGSA sentence generation
         pMarker = sentence;
@@ -714,7 +717,7 @@ void loc_eng_nmea_generate_sv(loc_eng_data_s_type *loc_eng_data_p,
 {
     ENTRY_LOG();
 
-    char sentence[NMEA_SENTENCE_MAX_LENGTH] = {0};
+    char sentence[NMEA_SENTENCE_MAX_LENGTH] = {};
     char* pMarker = sentence;
     int lengthRemaining = sizeof(sentence);
     int length = 0;

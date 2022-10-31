@@ -1,5 +1,5 @@
 # Copyright (C) 2012 The CyanogenMod Project
-# Copyright (C) 2017-2018 The LineageOS Project
+# Copyright (C) 2017-2018,2021 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 
 # inherit from qcom-common
 include device/samsung/qcom-common/BoardConfigCommon.mk
-
-BUILD_BROKEN_DUP_RULES := true
 
 # Platform
 TARGET_BOARD_PLATFORM := msm8226
@@ -51,11 +49,6 @@ TARGET_NEEDS_LEGACY_CAMERA_HAL1_DYN_NATIVE_HANDLE := true
 TARGET_USES_MEDIA_EXTENSIONS := true
 TARGET_USES_NON_TREBLE_CAMERA := true
 
-# Charger
-BOARD_BATTERY_DEVICE_NAME := "battery"
-BOARD_CHARGING_CMDLINE_NAME := "androidboot.mode"
-BOARD_CHARGING_CMDLINE_VALUE := "charger"
-
 # Dexpreopt
 ifeq ($(HOST_OS),linux)
   ifneq ($(TARGET_BUILD_VARIANT),eng)
@@ -65,44 +58,51 @@ ifeq ($(HOST_OS),linux)
 endif
 
 # Display
-OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
 TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS := 0x2000U | 0x02000000U
+TARGET_DISABLE_POSTRENDER_CLEANUP := true
+
+# Shader cache config options
+# Maximum size of the  GLES Shaders that can be cached for reuse.
+# Increase the size if shaders of size greater than 12KB are used.
+MAX_EGL_CACHE_KEY_SIZE := 12*1024
+
+# Maximum GLES shader cache size for each app to store the compiled shader
+# binaries. Decrease the size if RAM or Flash Storage size is a limitation
+# of the device.
+MAX_EGL_CACHE_SIZE := 2048*1024
 
 # Filesystem
-BOARD_ROOT_EXTRA_SYMLINKS := /data/tombstones:/tombstones
 TARGET_FS_CONFIG_GEN := device/samsung/msm8226-common/config.fs
-BOARD_ROOT_EXTRA_FOLDERS := \
-    firmware-modem \
-    firmware \
-    efs \
-    persist
 
 # HIDL
 DEVICE_MANIFEST_FILE := device/samsung/msm8226-common/manifest.xml
 DEVICE_MATRIX_FILE := device/samsung/msm8226-common/compatibility_matrix.xml
+PRODUCT_ENFORCE_VINTF_MANIFEST_OVERRIDE := true
 
-# Keymaster
-TARGET_KEYMASTER_SKIP_WAITING_FOR_QSEE := true
+# Kernel
+TARGET_KERNEL_ADDITIONAL_FLAGS := \
+    HOSTCFLAGS="-fuse-ld=lld -Wno-unused-command-line-argument"
+
+# Legacy memfd
+TARGET_HAS_MEMFD_BACKPORT := true
 
 # SELinux
 include device/samsung/msm8226-common/sepolicy/sepolicy.mk
-
-# Optimize
-#PRODUCT_SYSTEM_SERVER_COMPILER_FILTER := speed-profile
-#PRODUCT_ALWAYS_PREOPT_EXTRACTED_APK := true
-#PRODUCT_USE_PROFILE_FOR_BOOT_IMAGE := true
-#PRODUCT_DEX_PREOPT_BOOT_IMAGE_PROFILE_LOCATION := frameworks/base/config/boot-image-profile.txt
-#PRODUCT_MINIMIZE_JAVA_DEBUG_INFO := true
-#PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD := false
 
 # Partitions
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_VOLD_EMMC_SHARES_DEV_MAJOR := true
+BOARD_ROOT_EXTRA_FOLDERS := efs firmware firmware-modem persist
+BOARD_ROOT_EXTRA_SYMLINKS := \
+    /data/tombstones:/tombstones
 
 # Netd
 TARGET_NEEDS_NETD_DIRECT_CONNECT_RULE := true
+
+# Power
+TARGET_USES_INTERACTION_BOOST := true
 
 # Properties
 TARGET_SYSTEM_PROP += device/samsung/msm8226-common/system.prop
@@ -112,6 +112,9 @@ TARGET_RECOVERY_DEVICE_DIRS += device/samsung/msm8226-common
 
 # Time services
 BOARD_USES_QC_TIME_SERVICES := true
+
+# VNDK - Dedupe VNDK libraries with identical core variants.
+TARGET_VNDK_USE_CORE_VARIANT := true
 
 # Wifi
 BOARD_WLAN_DEVICE                := qcwcn
@@ -125,8 +128,11 @@ TARGET_PROVIDES_WCNSS_QMI        := true
 TARGET_USES_QCOM_WCNSS_QMI       := true
 TARGET_USES_WCNSS_CTRL           := true
 WPA_SUPPLICANT_VERSION           := VER_0_8_X
+WIFI_DRIVER_MODULE_PATH          := "/vendor/lib/modules/wlan.ko"
+WIFI_DRIVER_MODULE_NAME          := "wlan"
 WIFI_DRIVER_FW_PATH_STA          := "sta"
 WIFI_DRIVER_FW_PATH_AP           := "ap"
+WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 
 # inherit from the proprietary version
--include vendor/samsung/msm8226-common/BoardConfigVendor.mk
+include vendor/samsung/msm8226-common/BoardConfigVendor.mk

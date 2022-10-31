@@ -1,6 +1,5 @@
 allow vold efs_file:dir rw_dir_perms;
 allow vold efs_file:file create;
-allow vold media_data_file:dir { getattr search setattr };
 
 allow vold {
     block_device
@@ -8,3 +7,10 @@ allow vold {
     efs_block_device
     system_block_device
 }:blk_file getattr;
+
+allowxperm vold vold_device:blk_file ioctl 0x1271;
+allowxperm vold vold_device:blk_file ioctl BLKROGET;
+
+allow vold sysfs_mmc_host:file w_file_perms;
+
+dontaudit vold hal_bootctl_hwservice:hwservice_manager find;

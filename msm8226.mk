@@ -1,5 +1,5 @@
 # Copyright (C) 2012 The CyanogenMod Project
-# Copyright (C) 2017-2019 The LineageOS Project
+# Copyright (C) 2017-2021 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,13 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Always preopt extracted APKs to prevent extracting out of the APK
-# for gms modules.
-PRODUCT_ALWAYS_PREOPT_EXTRACTED_APK := true
-
-# System Server
-PRODUCT_SYSTEM_SERVER_COMPILER_FILTER := speed-profile
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
@@ -54,8 +47,8 @@ PRODUCT_COPY_FILES += \
 # Audio
 PRODUCT_PACKAGES += \
     android.hardware.audio@2.0-impl \
+    android.hardware.audio@2.0-service \
     android.hardware.audio.effect@2.0-impl \
-    audio_policy.msm8226 \
     audio.a2dp.default \
     audio.primary.msm8226 \
     audio.r_submix.default \
@@ -63,27 +56,25 @@ PRODUCT_PACKAGES += \
     libaudio-resampler \
     libqcomvisualizer \
     libqcompostprocbundle \
-    libqcomvoiceprocessing \
-    tinymix
+    libqcomvoiceprocessing
 
 # Bluetooth
 PRODUCT_PACKAGES += \
     android.hardware.bluetooth@1.0-impl \
+    android.hardware.bluetooth@1.0-service \
     libbt-vendor
 
 # Boot animation
 TARGET_BOOTANIMATION_HALF_RES := true
 
-# Dalvik
-$(call inherit-product, frameworks/native/build/phone-xhdpi-2048-dalvik-heap.mk)
-
 # Display
 PRODUCT_PACKAGES += \
     android.hardware.graphics.allocator@2.0-impl \
     android.hardware.graphics.allocator@2.0-service \
-    android.hardware.graphics.composer@2.1-impl \
+    android.hardware.graphics.composer@2.1-service \
     android.hardware.graphics.mapper@2.0-impl-2.1 \
     android.hardware.memtrack@1.0-impl \
+    android.hardware.memtrack@1.0-service \
     copybit.msm8226 \
     gralloc.msm8226 \
     hwcomposer.msm8226 \
@@ -97,9 +88,6 @@ PRODUCT_PACKAGES += \
     libxml2 \
     Snap
 
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/external_camera_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/external_camera_config.xml
-
 # DRM
 PRODUCT_PACKAGES += \
     android.hardware.drm@1.0-impl \
@@ -108,6 +96,10 @@ PRODUCT_PACKAGES += \
 # fastbootd
 PRODUCT_PACKAGES += \
     fastbootd
+
+# Gatekeeper
+PRODUCT_PACKAGES += \
+    android.hardware.gatekeeper@1.0-service.software
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -120,11 +112,11 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/gps/etc/gps.conf:system/etc/gps.conf \
     $(LOCAL_PATH)/gps/etc/izat.conf:system/etc/izat.conf \
     $(LOCAL_PATH)/gps/etc/sap.conf:system/etc/sap.conf
-    
+
 # Health
 PRODUCT_PACKAGES += \
-    android.hardware.health@2.0-impl \
-    android.hardware.health@2.0-service
+    android.hardware.health@2.1-impl \
+    android.hardware.health@2.1-service
 
 # Keylayouts
 PRODUCT_COPY_FILES += \
@@ -133,7 +125,8 @@ PRODUCT_COPY_FILES += \
 
 # Keymaster
 PRODUCT_PACKAGES += \
-    android.hardware.keymaster@3.0-impl
+    android.hardware.keymaster@3.0-impl \
+    android.hardware.keymaster@3.0-service
 
 # LiveDisplay
 PRODUCT_PACKAGES += \
@@ -143,15 +136,17 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_audio.xml \
     frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_telephony.xml \
-    frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_video.xml  \
     frameworks/av/media/libstagefright/data/media_codecs_google_video_le.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_video_le.xml \
     device/samsung/msm8226-common/configs/media_codecs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs.xml
 
+# Network - Do not spin up a separate process for the network stack, use an in-process APK.
+PRODUCT_PACKAGES += \
+    InProcessNetworkStack \
+    com.android.tethering.inprocess
+
 # Offline Charger
 PRODUCT_PACKAGES += \
-    charger \
-    charger_res_images \
-    lineage_charger_res_images
+    charger_res_images
 
 # OMX
 PRODUCT_PACKAGES += \
@@ -167,8 +162,8 @@ PRODUCT_PACKAGES += \
 
 # Power HAL
 PRODUCT_PACKAGES += \
-    android.hardware.power@1.2-service-qti
-    
+    android.hardware.power-service-qti
+
 # Preopt
 PRODUCT_DEXPREOPT_SPEED_APPS += \
     Settings \
@@ -178,8 +173,7 @@ PRODUCT_DEXPREOPT_SPEED_APPS += \
 
 # Ramdisk
 PRODUCT_PACKAGES += \
-    init.qcom.bt.sh \
-    init.ril.sh
+    init.qcom.bt.sh
 
 PRODUCT_PACKAGES += \
     init.qcom.power.rc \
@@ -187,7 +181,6 @@ PRODUCT_PACKAGES += \
     init.qcom.usb.rc \
     init.recovery.qcom.rc \
     ueventd.qcom.rc
-
 
 # RenderScript HAL
 PRODUCT_PACKAGES += \
@@ -199,22 +192,32 @@ PRODUCT_COPY_FILES += \
 
 # Sensors
 PRODUCT_PACKAGES += \
-    android.hardware.sensors@1.0-impl.samsung8226
+    android.hardware.sensors@1.0-impl.samsung8226 \
+    android.hardware.sensors@1.0-service.samsung8226
 
-# Touch features
+# Soong namespaces
+PRODUCT_SOONG_NAMESPACES += \
+    $(LOCAL_PATH)
+
+# TimeKeep
 PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.samsung
+    timekeep \
+    TimeKeep
 
 # USB
 PRODUCT_PACKAGES += \
     android.hardware.usb@1.0-service.basic
+
+# VNDK
+PRODUCT_COPY_FILES += \
+    prebuilts/vndk/v29/arm/arch-arm-armv7-a-neon/shared/vndk-core/libprotobuf-cpp-lite.so:$(TARGET_COPY_OUT_VENDOR)/lib/libprotobuf-cpp-lite-v29.so \
+    prebuilts/vndk/v29/arm/arch-arm-armv7-a-neon/shared/vndk-sp/libcutils.so:$(TARGET_COPY_OUT_VENDOR)/lib/libcutils-v29.so
 
 # Wifi
 PRODUCT_PACKAGES += \
     android.hardware.wifi@1.0-service.legacy \
     dhcpcd.conf \
     hostapd \
-    wificond \
     wpa_supplicant \
     wpa_supplicant.conf \
     libwpa_client
@@ -227,12 +230,13 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     $(LOCAL_PATH)/configs/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf \
-    $(LOCAL_PATH)/configs/wifi/hostapd_default.conf:system/etc/hostapd/hostapd_default.conf \
-    $(LOCAL_PATH)/prima/WCNSS_cfg.dat:system/etc/firmware/wlan/prima/WCNSS_cfg.dat \
-    $(LOCAL_PATH)/prima/WCNSS_qcom_cfg.ini:system/etc/firmware/wlan/prima/WCNSS_qcom_cfg.ini \
-    $(LOCAL_PATH)/prima/WCNSS_qcom_wlan_nv.bin:system/etc/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
+    $(LOCAL_PATH)/configs/wifi/hostapd_default.conf:$(TARGET_COPY_OUT_SYSTEM)/etc/hostapd/hostapd_default.conf \
+    $(LOCAL_PATH)/prima/WCNSS_cfg.dat:$(TARGET_COPY_OUT_SYSTEM)/etc/firmware/wlan/prima/WCNSS_cfg.dat \
+    $(LOCAL_PATH)/prima/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_SYSTEM)/etc/firmware/wlan/prima/WCNSS_qcom_cfg.ini \
+    $(LOCAL_PATH)/prima/WCNSS_qcom_wlan_nv.bin:$(TARGET_COPY_OUT_SYSTEM)/etc/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
+
 # Get non-open-source specific aspects
-$(call inherit-product-if-exists, vendor/samsung/msm8226-common/msm8226-common-vendor.mk)
+$(call inherit-product, vendor/samsung/msm8226-common/msm8226-common-vendor.mk)
 
 # common msm8226
 $(call inherit-product, device/samsung/qcom-common/qcom-common.mk)
