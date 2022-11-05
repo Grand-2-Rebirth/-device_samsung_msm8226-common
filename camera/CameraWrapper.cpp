@@ -124,7 +124,7 @@ static int get_product_device()
         product_device = KMINI3G;
     else if (device == "ms013g")
         product_device = MS01;
-    else if (device == "ms013lte")
+    else if (device == "ms01lte")
         product_device = MS01;
     else if (device == "matissewifi")
         product_device = MATISSE;
