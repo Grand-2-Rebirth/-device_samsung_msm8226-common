@@ -16,7 +16,7 @@
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     device/samsung/msm8226-common/overlay \
-    device/samsung/msm8226-common/overlay-lineage
+    device/samsung/msm8226-common/overlay-aosp
 
 # Permissions
 PRODUCT_COPY_FILES += \
